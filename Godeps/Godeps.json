@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/Ahineya/cyprushelper",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v67",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/PuerkitoBio/goquery",
+			"Comment": "v0.3.2-86-g2e29ea4",
+			"Rev": "2e29ea41f0d13f4a303c75553f4eeadddc7a4c56"
+		},
+		{
+			"ImportPath": "github.com/andybalholm/cascadia",
+			"Rev": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48"
+		},
+		{
+			"ImportPath": "github.com/go-telegram-bot-api/telegram-bot-api",
+			"Comment": "v4.2.1",
+			"Rev": "bf6e165e92e6da5dd62b859f8397f7c8864e4b04"
+		},
+		{
+			"ImportPath": "github.com/kennygrant/sanitize",
+			"Comment": "v1.0",
+			"Rev": "ce9fd1f6ce32afaa38b51feea32320fc8875e8e4"
+		},
+		{
+			"ImportPath": "github.com/technoweenie/multipartstreamer",
+			"Comment": "v1.0.1",
+			"Rev": "a90a01d73ae432e2611d178c18367fbaa13e0154"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "30be488e9140ebb7fac3b2995ac5a4b4d5e715ed"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/atom",
+			"Rev": "30be488e9140ebb7fac3b2995ac5a4b4d5e715ed"
+		}
+	]
+}
