@@ -8,6 +8,7 @@ import (
 	"github.com/Ahineya/cyprushelper/pharmacies"
 	//"github.com/Ahineya/cyprushelper/bypass-asp"
 	//"fmt"
+	"github.com/Ahineya/cyprushelper/seatemp"
 )
 
 var Messages = map[string]string{
@@ -80,6 +81,25 @@ func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 		sendPharmacies(bot, update, tokens)
 	case "/pharmacies" + bot_name:
 		sendPharmacies(bot, update, tokens)
+	case "/seatemp":
+		seatemp, err := seatemp.GetSeaTemp()
+		if err != nil {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
+			bot.Send(msg)
+		} else {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperatire in Limassol is " + seatemp)
+			bot.Send(msg)
+		}
+
+	case "/seatemp" + bot_name:
+		seatemp, err := seatemp.GetSeaTemp()
+		if err != nil {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
+			bot.Send(msg)
+		} else {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperatire in Limassol is " + seatemp)
+			bot.Send(msg)
+		}
 	}
 }
 
