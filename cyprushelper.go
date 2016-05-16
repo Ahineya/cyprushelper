@@ -20,19 +20,6 @@ const (
 )
 
 func main() {
-	/*
-		Just for testing ASP variables
-	 */
-	/*if true {
-		vars, err := bypassASP.GetASPViewStateVars("https://www.cyta.com.cy/id/m144/en")
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		fmt.Println(vars.VIEWSTATE + "\n")
-		fmt.Println(vars.EVENTVALIDATION)
-		return
-	}*/
-
 	if os.Getenv("ENV") == "PROD" {
 		panic("PROD not implemented")
 		/*
@@ -90,24 +77,48 @@ func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, Messages["Help"])
 		bot.Send(msg)
 	case "/pharmacies":
-		pharmacies, err := pharmacies.GetPharmacies()
-		if err != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
-			bot.Send(msg)
-		}
-
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join(pharmacies, "\n"))
-		msg.ParseMode = tgbotapi.ModeHTML
-		bot.Send(msg)
+		sendPharmacies(bot, update, tokens)
 	case "/pharmacies" + bot_name:
-		pharmacies, err := pharmacies.GetPharmacies()
-		if err != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
-			bot.Send(msg)
-		}
-
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join(pharmacies, "\n"))
-		msg.ParseMode = tgbotapi.ModeHTML
-		bot.Send(msg)
+		sendPharmacies(bot, update, tokens)
 	}
 }
+
+func sendPharmacies(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
+	allPharmacies, err := pharmacies.GetAllPharmacies()
+	if err != nil {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
+		bot.Send(msg)
+	}
+
+	// If envoked as /pharmacies CITY_NAME
+	if len(tokens) > 1 {
+		city := tokens[1]
+		found := false
+		for _, pharmaciesInCity := range allPharmacies {
+			if city == pharmaciesInCity.City {
+				found = true
+				text := pharmacies.FormatPharmacies(pharmaciesInCity)
+
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join([]string{text}, "\n"))
+				msg.ParseMode = tgbotapi.ModeHTML
+				bot.Send(msg)
+			}
+		}
+
+		if !found {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "City " + `"` + city + `" not found`)
+			bot.Send(msg)
+		}
+	} else {
+		for _, pharmaciesInCity := range allPharmacies {
+			text := pharmacies.FormatPharmacies(pharmaciesInCity)
+
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join([]string{text}, "\n"))
+			msg.ParseMode = tgbotapi.ModeHTML
+			bot.Send(msg)
+		}
+	}
+}
+
+
+

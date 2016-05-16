@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/Ahineya/cyprushelper",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v67",
+	"GodepVersion": "v66",
 	"Packages": [
 		"./..."
 	],
