@@ -10,8 +10,6 @@ import (
 	//"fmt"
 	"github.com/Ahineya/cyprushelper/seatemp"
 	"net/http"
-	"io"
-	"fmt"
 )
 
 var Messages = map[string]string{
@@ -24,32 +22,6 @@ const (
 )
 
 func main() {
-
-	/*token := os.Getenv("BOT_TOKEN")
-	if len(token) == 0 {
-		panic("You need to set BOT_TOKEN environment variable")
-	}
-	bot, err := tgbotapi.NewBotAPI(token)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates, err := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-		if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
-			processUpdate(bot, update)
-		}
-	}*/
 
 	if os.Getenv("ENV") == "PROD" {
 
@@ -69,11 +41,6 @@ func main() {
 			panic("You need to set PORT environment variable")
 		}
 
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			io.WriteString(w, "ok")
-		})
-		http.ListenAndServe("0.0.0.0:" + port, nil)
-
 		token := os.Getenv("BOT_TOKEN")
 		if len(token) == 0 {
 			panic("You need to set BOT_TOKEN environment variable")
@@ -91,23 +58,51 @@ func main() {
 
 		log.Printf("Authorized on account %s", bot.Self.UserName)
 
-		_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookURL))
+		_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookURL + bot.Token))
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		updates := bot.ListenForWebhook("/" + bot.Token)
+		bot.Debug = true
 
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "ok")
-		})
+		updates := bot.ListenForWebhook("/" + bot.Token)
 
 		go http.ListenAndServe("0.0.0.0:" + port, nil)
 
 		for update := range updates {
-			log.Printf("%+v\n", update)
+			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+			if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
+				processUpdate(bot, update)
+			}
 		}
 
+	} else {
+		token := os.Getenv("BOT_TOKEN")
+		if len(token) == 0 {
+			panic("You need to set BOT_TOKEN environment variable")
+		}
+		bot, err := tgbotapi.NewBotAPI(token)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		bot.Debug = true
+
+		log.Printf("Authorized on account %s", bot.Self.UserName)
+
+		u := tgbotapi.NewUpdate(0)
+		u.Timeout = 60
+
+		updates, err := bot.GetUpdatesChan(u)
+
+		for update := range updates {
+			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+			if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
+				processUpdate(bot, update)
+			}
+		}
 	}
 
 }
