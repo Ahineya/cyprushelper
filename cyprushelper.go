@@ -11,6 +11,7 @@ import (
 	"github.com/Ahineya/cyprushelper/seatemp"
 	"net/http"
 	"io"
+	"fmt"
 )
 
 var Messages = map[string]string{
@@ -24,7 +25,7 @@ const (
 
 func main() {
 
-	token := os.Getenv("BOT_TOKEN")
+	/*token := os.Getenv("BOT_TOKEN")
 	if len(token) == 0 {
 		panic("You need to set BOT_TOKEN environment variable")
 	}
@@ -48,9 +49,9 @@ func main() {
 		if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
 			processUpdate(bot, update)
 		}
-	}
+	}*/
 
-	//if os.Getenv("ENV") == "PROD" {
+	if os.Getenv("ENV") == "PROD" {
 
 		/*
 			Here we will add a production version handler with webhook,
@@ -73,7 +74,7 @@ func main() {
 		})
 		http.ListenAndServe("0.0.0.0:" + port, nil)
 
-		/*token := os.Getenv("BOT_TOKEN")
+		token := os.Getenv("BOT_TOKEN")
 		if len(token) == 0 {
 			panic("You need to set BOT_TOKEN environment variable")
 		}
@@ -81,11 +82,6 @@ func main() {
 		webhookURL := os.Getenv("WEBHOOK_URL")
 		if len(webhookURL) == 0 {
 			panic("You need to set WEBHOOK_URL environment variable")
-		}
-
-		port := os.Getenv("PORT")
-		if len(port) == 0 {
-			panic("You need to set PORT environment variable")
 		}
 
 		bot, err := tgbotapi.NewBotAPI(token)
@@ -101,16 +97,18 @@ func main() {
 		}
 
 		updates := bot.ListenForWebhook("/" + bot.Token)
+
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			io.WriteString(w, "ok")
+			fmt.Fprintf(w, "ok")
 		})
+
 		go http.ListenAndServe("0.0.0.0:" + port, nil)
 
 		for update := range updates {
 			log.Printf("%+v\n", update)
-		}*/
+		}
 
-
+	}
 
 }
 
