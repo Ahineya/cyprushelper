@@ -24,7 +24,29 @@ const (
 
 func main() {
 	if os.Getenv("ENV") == "PROD" {
-		token := os.Getenv("BOT_TOKEN")
+
+		/*
+			Here we will add a production version handler with webhook,
+			like in https://github.com/go-telegram-bot-api/telegram-bot-api
+
+			I think it will be good to have WEBHOOK_URL environment variable for that,
+			to not expose it on the Github.
+
+			For now there is a problem: after setting webhook via telegram-bot-api heroku still thoughts that
+			there is no connection to application, and stops it after 60 seconds.
+		 */
+
+		port := os.Getenv("PORT")
+		if len(port) == 0 {
+			panic("You need to set PORT environment variable")
+		}
+
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "ok")
+		})
+		http.ListenAndServe("0.0.0.0:" + port, nil)
+
+		/*token := os.Getenv("BOT_TOKEN")
 		if len(token) == 0 {
 			panic("You need to set BOT_TOKEN environment variable")
 		}
@@ -59,35 +81,36 @@ func main() {
 
 		for update := range updates {
 			log.Printf("%+v\n", update)
-		}
+		}*/
 
-	} else {
-		token := os.Getenv("BOT_TOKEN")
-		if len(token) == 0 {
-			panic("You need to set BOT_TOKEN environment variable")
-		}
-		bot, err := tgbotapi.NewBotAPI(token)
-		if err != nil {
-			log.Panic(err)
-		}
+	}
 
-		bot.Debug = true
+	token := os.Getenv("BOT_TOKEN")
+	if len(token) == 0 {
+		panic("You need to set BOT_TOKEN environment variable")
+	}
+	bot, err := tgbotapi.NewBotAPI(token)
+	if err != nil {
+		log.Panic(err)
+	}
 
-		log.Printf("Authorized on account %s", bot.Self.UserName)
+	bot.Debug = true
 
-		u := tgbotapi.NewUpdate(0)
-		u.Timeout = 60
+	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-		updates, err := bot.GetUpdatesChan(u)
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
 
-		for update := range updates {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+	updates, err := bot.GetUpdatesChan(u)
 
-			if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
-				processUpdate(bot, update)
-			}
+	for update := range updates {
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+		if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
+			processUpdate(bot, update)
 		}
 	}
+
 }
 
 // Refactor all this switch stuff to different modules
