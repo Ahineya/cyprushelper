@@ -9,6 +9,7 @@ import (
 	//"github.com/Ahineya/cyprushelper/bypass-asp"
 	//"fmt"
 	"github.com/Ahineya/cyprushelper/seatemp"
+	"net/http"
 )
 
 var Messages = map[string]string{
@@ -22,14 +23,39 @@ const (
 
 func main() {
 	if os.Getenv("ENV") == "PROD" {
-		panic("PROD not implemented")
-		/*
-			Here we will add a production version handler with webhook,
-			like in https://github.com/go-telegram-bot-api/telegram-bot-api
-			
-			I think it will be good to have WEBHOOK_URL environment variable for that,
-			to not expose it on the Github.
-		 */
+		token := os.Getenv("BOT_TOKEN")
+		if len(token) == 0 {
+			panic("You need to set BOT_TOKEN environment variable")
+		}
+
+		webhookURL := os.Getenv("WEBHOOK_URL")
+		if len(webhookURL) == 0 {
+			panic("You need to set WEBHOOK_URL environment variable")
+		}
+
+		port := os.Getenv("PORT")
+		if len(port) == 0 {
+			panic("You need to set PORT environment variable")
+		}
+
+		bot, err := tgbotapi.NewBotAPI(token)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("Authorized on account %s", bot.Self.UserName)
+
+		_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookURL))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		updates := bot.ListenForWebhook("/" + bot.Token)
+		go http.ListenAndServe("0.0.0.0:" + port, nil)
+
+		for update := range updates {
+			log.Printf("%+v\n", update)
+		}
 	} else {
 		token := os.Getenv("BOT_TOKEN")
 		if len(token) == 0 {
