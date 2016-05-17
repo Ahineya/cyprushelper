@@ -10,6 +10,7 @@ import (
 	//"fmt"
 	"github.com/Ahineya/cyprushelper/seatemp"
 	"net/http"
+	"io"
 )
 
 var Messages = map[string]string{
@@ -51,11 +52,15 @@ func main() {
 		}
 
 		updates := bot.ListenForWebhook("/" + bot.Token)
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "ok")
+		})
 		go http.ListenAndServe("0.0.0.0:" + port, nil)
 
 		for update := range updates {
 			log.Printf("%+v\n", update)
 		}
+
 	} else {
 		token := os.Getenv("BOT_TOKEN")
 		if len(token) == 0 {
