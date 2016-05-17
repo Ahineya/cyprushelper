@@ -10,6 +10,7 @@ import (
 	//"fmt"
 	"github.com/Ahineya/cyprushelper/seatemp"
 	"net/http"
+	"github.com/Ahineya/cyprushelper/stats"
 )
 
 var Messages = map[string]string{
@@ -98,6 +99,7 @@ func main() {
 
 // Refactor all this switch stuff to different modules
 func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
+	stats.Track(update.Message)
 	tokens := strings.Fields(update.Message.Text)
 	command := tokens[0]
 
