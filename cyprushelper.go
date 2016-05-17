@@ -82,24 +82,9 @@ func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	case "/pharmacies" + bot_name:
 		sendPharmacies(bot, update, tokens)
 	case "/seatemp":
-		seatemp, err := seatemp.GetSeaTemp()
-		if err != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
-			bot.Send(msg)
-		} else {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperatire in Limassol is " + seatemp)
-			bot.Send(msg)
-		}
-
+		sendSeaTemp(bot, update, tokens)
 	case "/seatemp" + bot_name:
-		seatemp, err := seatemp.GetSeaTemp()
-		if err != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
-			bot.Send(msg)
-		} else {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperatire in Limassol is " + seatemp)
-			bot.Send(msg)
-		}
+		sendSeaTemp(bot, update, tokens)
 	}
 }
 
@@ -108,28 +93,11 @@ func sendPharmacies(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []strin
 	if err != nil {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
 		bot.Send(msg)
+		return;
 	}
 
-	// If envoked as /pharmacies CITY_NAME
-	if len(tokens) > 1 {
-		city := tokens[1]
-		found := false
-		for _, pharmaciesInCity := range allPharmacies {
-			if city == pharmaciesInCity.City {
-				found = true
-				text := pharmacies.FormatPharmacies(pharmaciesInCity)
-
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join([]string{text}, "\n"))
-				msg.ParseMode = tgbotapi.ModeHTML
-				bot.Send(msg)
-			}
-		}
-
-		if !found {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "City " + `"` + city + `" not found`)
-			bot.Send(msg)
-		}
-	} else {
+	// Send info for all cities
+	if len(tokens) < 2 {
 		for _, pharmaciesInCity := range allPharmacies {
 			text := pharmacies.FormatPharmacies(pharmaciesInCity)
 
@@ -137,8 +105,49 @@ func sendPharmacies(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []strin
 			msg.ParseMode = tgbotapi.ModeHTML
 			bot.Send(msg)
 		}
+		return;
 	}
+
+	// If envoked as /pharmacies CITY_NAME
+	city := pharmacies.NormalizeCity(strings.ToLower(tokens[1]))
+	found := false
+	for _, pharmaciesInCity := range allPharmacies {
+		if city == pharmaciesInCity.City {
+			found = true
+			text := pharmacies.FormatPharmacies(pharmaciesInCity)
+
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join([]string{text}, "\n"))
+			msg.ParseMode = tgbotapi.ModeHTML
+			bot.Send(msg)
+			break;
+		}
+	}
+
+	if !found {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "City " + `"` + city + `" not found`)
+		bot.Send(msg)
+	}
+
 }
 
+func sendSeaTemp(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
 
+	if len(tokens) < 2 {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Please, define city: /seatemp city_name")
+		bot.Send(msg)
+		return
+	}
+
+	city := strings.ToLower(tokens[1])
+	seatemp, err := seatemp.GetSeaTemp(city)
+	if err != nil {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Can't find a sea temperature for " + strings.Join(tokens[1:], " ") + ", error happen: " + err.Error())
+		bot.Send(msg)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperatire in " + strings.Join(tokens[1:], " ") +" is " + seatemp)
+	bot.Send(msg)
+
+}
 

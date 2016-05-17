@@ -2,7 +2,6 @@ package pharmacies
 
 import (
 	"errors"
-	"regexp"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/kennygrant/sanitize"
 	"net/http"
@@ -10,7 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-	"unicode"
+	"github.com/Ahineya/cyprushelper/utils"
 )
 
 const (
@@ -86,7 +85,7 @@ func GetAllPharmacies() (AllPharmacies, error) {
 }
 
 func FormatPharmacies(pharmaciesInCity PharmaciesInCity) string {
-	result := "<b>" + UpcaseInitial(pharmaciesInCity.City) + "</b>\n\n"
+	result := "<b>" + utils.UpcaseInitial(pharmaciesInCity.City) + "</b>\n\n"
 
 	for idx, pharmacy := range pharmaciesInCity.Pharmacies {
 		result += "<b>" + strconv.Itoa(idx + 1) + ". "
@@ -119,7 +118,7 @@ func getCities(doc *goquery.Document) (Cities, error) {
 		if err != nil {
 			return cities, errors.New("Can't parse pharmacy")
 		}
-		pharmacy = replace(pharmacy, "<br/>", " ")
+		pharmacy = utils.Replace(pharmacy, "<br/>", " ")
 
 		cities = append(cities, pharmacy)
 	}
@@ -194,7 +193,7 @@ func getDataForCity(doc *goquery.Document, cityId int, selector string) ([]strin
 		if err != nil {
 			return data, errors.New("Can't parse pharmacy")
 		}
-		pharmacy = replace(pharmacy, "<br/>", " ")
+		pharmacy = utils.Replace(pharmacy, "<br/>", " ")
 
 		data = append(data, pharmacy)
 	}
@@ -202,15 +201,26 @@ func getDataForCity(doc *goquery.Document, cityId int, selector string) ([]strin
 	return data, nil
 }
 
-// TODO: move to utils
-func replace(str string, tag string, replacer string) string {
-	r := regexp.MustCompile(tag)
-	return r.ReplaceAllString(str, replacer)
-}
-
-func UpcaseInitial(str string) string {
-	for i, v := range str {
-		return string(unicode.ToUpper(v)) + str[i + 1:]
+func NormalizeCity(city string) string {
+	if city == "limassol" || city == "lemesos" {
+		return "limassol"
 	}
-	return ""
+
+	if city == "pafos" || city == "paphos" {
+		return "paphos"
+	}
+
+	if city == "larnaka" || city == "larnaca" {
+		return "larnaca"
+	}
+
+	if city == "lefcosia" || city == "nicosia" {
+		return "nicosia"
+	}
+
+	if city == "famagusta" {
+		return "famagusta"
+	}
+
+	return city
 }
