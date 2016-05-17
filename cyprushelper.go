@@ -18,6 +18,7 @@ var Messages = map[string]string{
 }
 
 const (
+	// TODO: define as environment variable
 	bot_name = "CyprusHelper_bot"
 )
 
