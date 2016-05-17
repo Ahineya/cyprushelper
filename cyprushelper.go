@@ -24,18 +24,6 @@ const (
 func main() {
 
 	if os.Getenv("ENV") == "PROD" {
-
-		/*
-			Here we will add a production version handler with webhook,
-			like in https://github.com/go-telegram-bot-api/telegram-bot-api
-
-			I think it will be good to have WEBHOOK_URL environment variable for that,
-			to not expose it on the Github.
-
-			For now there is a problem: after setting webhook via telegram-bot-api heroku still thoughts that
-			there is no connection to application, and stops it after 60 seconds.
-		 */
-
 		port := os.Getenv("PORT")
 		if len(port) == 0 {
 			panic("You need to set PORT environment variable")
