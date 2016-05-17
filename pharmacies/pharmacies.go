@@ -54,6 +54,8 @@ func GetAllPharmacies() (AllPharmacies, error) {
 		return AllPharmacies{}, err
 	}
 
+	defer resp.Body.Close()
+
 	page, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return AllPharmacies{}, err

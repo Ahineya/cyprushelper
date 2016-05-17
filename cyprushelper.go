@@ -11,6 +11,7 @@ import (
 	"github.com/Ahineya/cyprushelper/seatemp"
 	"net/http"
 	"github.com/Ahineya/cyprushelper/stats"
+	"github.com/Ahineya/cyprushelper/pollution"
 )
 
 var Messages = map[string]string{
@@ -24,7 +25,6 @@ const (
 )
 
 func main() {
-
 	if os.Getenv("ENV") == "PROD" {
 		port := os.Getenv("PORT")
 		if len(port) == 0 {
@@ -124,6 +124,10 @@ func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 		sendSeaTemp(bot, update, tokens)
 	case "/seatemp" + bot_name:
 		sendSeaTemp(bot, update, tokens)
+	case "/pollution":
+		sendPollution(bot, update, tokens)
+	case "/pollution" + bot_name:
+		sendPollution(bot, update, tokens)
 	}
 }
 
@@ -190,3 +194,14 @@ func sendSeaTemp(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) 
 
 }
 
+func sendPollution(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
+	pollutionResult, err := pollution.GetPollution("")
+	if err != nil {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Can't find pollution info for " + strings.Join(tokens[1:], " ") + ", error happen: " + err.Error())
+		bot.Send(msg)
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Pollution in " + strings.Join(tokens[1:], " ") + "is: " + pollution.FormatPollution(pollutionResult))
+	msg.ParseMode = tgbotapi.ModeHTML
+	bot.Send(msg)
+}
