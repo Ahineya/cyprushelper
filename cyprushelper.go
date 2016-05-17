@@ -23,7 +23,34 @@ const (
 )
 
 func main() {
-	if os.Getenv("ENV") == "PROD" {
+
+	token := os.Getenv("BOT_TOKEN")
+	if len(token) == 0 {
+		panic("You need to set BOT_TOKEN environment variable")
+	}
+	bot, err := tgbotapi.NewBotAPI(token)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
+
+	updates, err := bot.GetUpdatesChan(u)
+
+	for update := range updates {
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+		if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
+			processUpdate(bot, update)
+		}
+	}
+
+	//if os.Getenv("ENV") == "PROD" {
 
 		/*
 			Here we will add a production version handler with webhook,
@@ -83,33 +110,7 @@ func main() {
 			log.Printf("%+v\n", update)
 		}*/
 
-	}
 
-	token := os.Getenv("BOT_TOKEN")
-	if len(token) == 0 {
-		panic("You need to set BOT_TOKEN environment variable")
-	}
-	bot, err := tgbotapi.NewBotAPI(token)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates, err := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-		if (len(update.Message.Text) > 1 && string(update.Message.Text[0]) == "/") {
-			processUpdate(bot, update)
-		}
-	}
 
 }
 
