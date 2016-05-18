@@ -15,8 +15,10 @@ type Message struct {
 }
 
 var botan_token string
+
 func Track(message *tgbotapi.Message) {
 	ch := make(chan bool)
+
 	if (botan_token == "") {
 		botan_token = os.Getenv("BOTAN_TOKEN")
 	}
@@ -26,7 +28,7 @@ func Track(message *tgbotapi.Message) {
 	command := tokens[0]
 
 	bot.TrackAsync(message.From.ID, Message{100, 500}, command, func(ans botan.Answer, err []error) {
-		fmt.Printf("Asynchonous: %+v\n", ans)
+		fmt.Printf("[BOTAN]: %+v\n", ans)
 		ch <- true
 	})
 

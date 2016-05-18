@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"github.com/Ahineya/cyprushelper/stats"
 	"github.com/Ahineya/cyprushelper/pollution"
+	"github.com/Ahineya/cyprushelper/storage"
+	"fmt"
 )
 
 var Messages = map[string]string{
@@ -99,9 +101,10 @@ func main() {
 
 // Refactor all this switch stuff to different modules
 func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
-	if os.Getenv("ENV") == "PROD" {
+	//if os.Getenv("ENV") == "PROD" {
 		stats.Track(update.Message)
-	}
+		go storage.UpdateChats(update.Message)
+	//}
 
 	tokens := strings.Fields(update.Message.Text)
 	command := tokens[0]
