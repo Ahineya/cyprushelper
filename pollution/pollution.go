@@ -14,7 +14,7 @@ import (
 
 const (
 	pollution_url = "http://www.airquality.dli.mlsi.gov.cy/site/ajax_exec"
-	pollution_service_update_time = "4000"
+	pollution_service_update_time = "4500"
 )
 
 type PollutionData struct {

@@ -54,6 +54,8 @@ func main() {
 
 		bot.Debug = true
 
+		setupServices(bot)
+
 		updates := bot.ListenForWebhook("/" + bot.Token)
 
 		go http.ListenAndServe("0.0.0.0:" + port, nil)
