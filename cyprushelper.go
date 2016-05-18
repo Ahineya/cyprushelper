@@ -99,7 +99,10 @@ func main() {
 
 // Refactor all this switch stuff to different modules
 func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
-	stats.Track(update.Message)
+	if os.Getenv("ENV") == "PROD" {
+		stats.Track(update.Message)
+	}
+
 	tokens := strings.Fields(update.Message.Text)
 	command := tokens[0]
 
