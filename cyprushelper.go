@@ -13,7 +13,6 @@ import (
 	"github.com/Ahineya/cyprushelper/stats"
 	"github.com/Ahineya/cyprushelper/pollution"
 	"github.com/Ahineya/cyprushelper/storage"
-	"fmt"
 )
 
 var Messages = map[string]string{
