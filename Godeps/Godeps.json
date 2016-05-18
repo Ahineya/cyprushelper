@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/Ahineya/cyprushelper",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v67",
+	"GodepVersion": "v66",
 	"Deps": [
 		{
 			"ImportPath": "github.com/PuerkitoBio/goquery",
@@ -25,6 +25,10 @@
 			"ImportPath": "github.com/kennygrant/sanitize",
 			"Comment": "v1.0",
 			"Rev": "ce9fd1f6ce32afaa38b51feea32320fc8875e8e4"
+		},
+		{
+			"ImportPath": "github.com/orchestrate-io/gorc",
+			"Rev": "c8badfce1db1a8d4e42d4a3c4656023052e194c7"
 		},
 		{
 			"ImportPath": "github.com/rockneurotiko/gorequest",

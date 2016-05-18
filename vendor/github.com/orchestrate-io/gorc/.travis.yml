@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - 1.1
+  - 1.2
+  - 1.3
+  - 1.4
+
+notifications:
+  email: false
+  slack:
+    secure: PN2UIx7k8uM0tu2LxApDGbbps9JNYYoG817yORrXujbXP8hnLmBP7+G2rmG18mgEPtzuRINSSDkxNeIhsXDE+1EWA8W0IorA0JGMsHYfpbENAbPQYRI1NtheGwAW7vm5KDMoLCmP0Sm9Uq4Zr65inY/lv6pwVBd5/aMxvOYa3Q4=
