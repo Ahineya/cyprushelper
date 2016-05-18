@@ -54,7 +54,8 @@ func main() {
 
 		bot.Debug = true
 
-		setupServices(bot)
+		// Temporarily disable services
+		//setupServices(bot)
 
 		updates := bot.ListenForWebhook("/" + bot.Token)
 
