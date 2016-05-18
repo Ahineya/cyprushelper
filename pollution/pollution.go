@@ -12,7 +12,10 @@ import (
 	"fmt"
 )
 
-const pollution_url = "http://www.airquality.dli.mlsi.gov.cy/site/ajax_exec"
+const (
+	pollution_url = "http://www.airquality.dli.mlsi.gov.cy/site/ajax_exec"
+	pollution_service_update_time = "4000"
+)
 
 type PollutionData struct {
 	DateTime          string `json:"date_time"`
@@ -84,11 +87,39 @@ func GetPollution(city string) (*PollutionResult, error) {
 	return &pollutionResult, nil
 }
 
+func CreatePollutionService(syncChan chan string) {
+	fmt.Println("[PollutionService]: Initialized")
+	ticker := time.NewTicker(time.Second)
+	cachedPollutionLevel := ""
+	go func() {
+		for t := range ticker.C {
+			if t.Format("0405") == pollution_service_update_time {
+				fmt.Println("[PollutionService]: Getting updates")
+				pollutionResult, err := GetPollution("limassol")
+				if err != nil {
+					fmt.Println("[PollutionService]: " + err.Error())
+				}
+
+				for _, pollutionData := range pollutionResult.Data {
+					if pollutionData.PollutantCode == "PM10" {
+						pollutionLevel := getPollutionLevel(pollutionData.PollutantCode, pollutionData.Value)
+						if pollutionLevel != cachedPollutionLevel {
+							cachedPollutionLevel = pollutionLevel
+							fmt.Println("[PollutionService]: Pollution level changed, sending updates")
+							syncChan <- "Current pollution level in Limassol changed to " + pollutionLevel
+						}
+					}
+				}
+			}
+		}
+	}()
+}
+
 func FormatPollution(pollution *PollutionResult) string {
 	result := ""
 
 	for _, pollutionData := range pollution.Data {
-		result += getPollutionLevel(pollutionData.PollutantCode, pollutionData.Value) + " "
+		result += "[<b>" + getPollutionLevel(pollutionData.PollutantCode, pollutionData.Value) + "</b>] "
 		result += normalizePollutantCode(pollutionData.PollutantCode) + ": "
 		result += "<b>" + pollutionData.Value + "</b> μg/m³\n"
 	}
@@ -116,8 +147,6 @@ func normalizeCity(city string) string {
 	return ""
 }
 
-
-
 func normalizePollutantCode(pollutantCode string) string {
 	pollutants := make(map[string]string)
 	pollutants["NO"] = "Nitrogen Oxide"
@@ -141,14 +170,14 @@ func getPollutionLevel(pollutantCode string, value string) string {
 	}
 	if pollutantCode == "PM10" {
 		if intValue < 50 {
-			return "[<b>Low</b>]"
+			return "Low"
 		} else if intValue >= 50 && intValue < 100 {
-			return "[<b>Moderate</b>]"
+			return "Moderate"
 		} else if intValue >= 100 && intValue < 200 {
-			return "[<b>High</b>]"
+			return "High"
 		} else if intValue >= 200 {
-			return "[<b>Very high</b>]"
+			return "Very high"
 		}
 	}
-	return ""
+	return "-"
 }

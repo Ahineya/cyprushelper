@@ -6,8 +6,6 @@ import (
 	"log"
 	"strings"
 	"github.com/Ahineya/cyprushelper/pharmacies"
-	//"github.com/Ahineya/cyprushelper/bypass-asp"
-	//"fmt"
 	"github.com/Ahineya/cyprushelper/seatemp"
 	"net/http"
 	"github.com/Ahineya/cyprushelper/stats"
@@ -85,6 +83,8 @@ func main() {
 		u := tgbotapi.NewUpdate(0)
 		u.Timeout = 60
 
+		setupServices(bot)
+
 		updates, err := bot.GetUpdatesChan(u)
 
 		for update := range updates {
@@ -96,6 +96,33 @@ func main() {
 		}
 	}
 
+
+
+}
+
+func setupServices(bot *tgbotapi.BotAPI) {
+	// Setting up a pollution service
+	pollutionServiceChannel := make(chan string)
+	pollution.CreatePollutionService(pollutionServiceChannel)
+	go func() {
+		for pollutionData := range pollutionServiceChannel {
+
+			// Get all chat Ids
+			chats, err := storage.GetChatIds()
+			if err != nil {
+				continue
+			}
+			// Send messages to all chats
+
+			for _, chatId := range chats {
+				msg := tgbotapi.NewMessage(chatId, pollutionData)
+				bot.Send(msg)
+			}
+
+			// // Set a ticker for batch sending updates to ids
+
+		}
+	}()
 }
 
 // Refactor all this switch stuff to different modules
