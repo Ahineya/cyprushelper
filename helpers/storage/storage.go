@@ -3,9 +3,9 @@ package storage
 import (
 	"os"
 	"github.com/orchestrate-io/gorc"
-	"fmt"
 	"github.com/Ahineya/cyprushelper/helpers/utils"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/Ahineya/cyprushelper/helpers/logger"
 )
 
 type Chats struct {
@@ -18,7 +18,7 @@ var chats_collection_name string
 func UpdateChats(message *tgbotapi.Message) {
 	chats, err := GetChatIds()
 	if err != nil {
-		fmt.Printf(err.Error())
+		logger.Error("STORAGE", err.Error())
 	}
 
 	if !utils.Int64InSlice(message.Chat.ID, chats) {
@@ -27,13 +27,13 @@ func UpdateChats(message *tgbotapi.Message) {
 		c := gorc.NewClient(storage_token)
 		_, err = c.Put("stats", chats_collection_name, Chats{chats})
 		if err != nil {
-			fmt.Println("[STORAGE]:" + err.Error())
+			logger.Error("STORAGE", err.Error())
 			return
 		}
 
-		fmt.Println("[STORAGE]: Chats updated");
+		logger.Info("STORAGE", "Chats updated")
 	} else {
-		fmt.Println("[STORAGE]: No new chats");
+		logger.Info("STORAGE", "No new chats")
 	}
 }
 
@@ -55,7 +55,7 @@ func GetChatIds() ([]int64, error) {
 		c := gorc.NewClient(storage_token)
 		result, err := c.Get("stats", chats_collection_name)
 		if err != nil {
-			fmt.Println("[STORAGE]:" + err.Error())
+			logger.Error("STORAGE", err.Error())
 			return []int64{}, err
 		}
 

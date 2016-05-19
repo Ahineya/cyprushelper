@@ -3,9 +3,9 @@ package pollutionservice
 import (
 	"github.com/Ahineya/cyprushelper/helpers/storage"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"fmt"
 	"time"
 	"github.com/Ahineya/cyprushelper/dataproviders/pollution"
+	"github.com/Ahineya/cyprushelper/helpers/logger"
 )
 
 const (
@@ -36,16 +36,16 @@ func Start(bot *tgbotapi.BotAPI) {
 }
 
 func createPollutionService(syncChan chan string) {
-	fmt.Println("[PollutionService]: Initialized")
+	logger.Info("PollutionService", "Initialized")
 	ticker := time.NewTicker(time.Second)
 	cachedPollutionLevel := ""
 	go func() {
 		for t := range ticker.C {
 			if t.Format("0405") == update_time {
-				fmt.Println("[PollutionService]: Getting updates")
+				logger.Info("PollutionService", "Getting updates")
 				pollutionResult, err := pollution.GetPollution("limassol")
 				if err != nil {
-					fmt.Println("[PollutionService]: " + err.Error())
+					logger.Warn("PollutionService", err.Error())
 				}
 
 				for _, pollutionData := range pollutionResult.Data {
@@ -53,7 +53,7 @@ func createPollutionService(syncChan chan string) {
 						pollutionLevel := pollution.GetPollutionLevel(pollutionData.PollutantCode, pollutionData.Value)
 						if pollutionLevel != cachedPollutionLevel {
 							cachedPollutionLevel = pollutionLevel
-							fmt.Println("[PollutionService]: Pollution level changed, sending updates")
+							logger.Info("PollutionService", "Pollution level changed, sending updates")
 							syncChan <- "Current pollution level in Limassol changed to " + pollutionLevel
 						}
 					}

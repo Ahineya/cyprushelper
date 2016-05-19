@@ -9,7 +9,7 @@ import (
 	"strings"
 	"errors"
 	"strconv"
-	"fmt"
+	"github.com/Ahineya/cyprushelper/helpers/logger"
 )
 
 const (
@@ -136,7 +136,7 @@ func normalizePollutantCode(pollutantCode string) string {
 func GetPollutionLevel(pollutantCode string, value string) string {
 	intValue, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Warn("POLLUTION", err.Error())
 		return ""
 	}
 	if pollutantCode == "PM10" {

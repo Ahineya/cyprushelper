@@ -41,6 +41,11 @@
 			"Rev": "a90a01d73ae432e2611d178c18367fbaa13e0154"
 		},
 		{
+			"ImportPath": "github.com/ttacon/chalk",
+			"Comment": "v0.1-2-ge66ca4d",
+			"Rev": "e66ca4d608eb6dc36d012bceeb08ef9f379134c1"
+		},
+		{
 			"ImportPath": "golang.org/x/net/html",
 			"Rev": "30be488e9140ebb7fac3b2995ac5a4b4d5e715ed"
 		},

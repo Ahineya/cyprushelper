@@ -2,10 +2,10 @@ package stats
 
 import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"fmt"
 	"os"
 	"github.com/botanio/sdk/go"
 	"strings"
+	"github.com/Ahineya/cyprushelper/helpers/logger"
 )
 
 // TODO: Make proper metrics
@@ -28,7 +28,11 @@ func Track(message *tgbotapi.Message) {
 	command := tokens[0]
 
 	bot.TrackAsync(message.From.ID, Message{100, 500}, command, func(ans botan.Answer, err []error) {
-		fmt.Printf("[BOTAN]: %+v\n", ans)
+		if len(err) == 0 {
+			logger.Info("BOTAN", ans.Status + " " + ans.Info)
+		} else {
+			logger.Warn("BOTAN", ans.Status + " " + ans.Info)
+		}
 		ch <- true
 	})
 
