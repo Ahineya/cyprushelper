@@ -21,6 +21,41 @@ var Messages = map[string]string{
 const (
 	// TODO: define as environment variable
 	bot_name = "CyprusHelper_bot"
+
+	// TODO: find proper place for such messages
+	seatemp_commands_message = `
+	Please, define city: /seatemp city_name
+	Or use commands for available cities:
+
+	Limassol: /seatemp_limassol
+	Paphos: /seatemp_pafos
+	Larnaka: /seatemp_larnaka
+	Nicosia (Kato Pyrgos): /seatemp_nicosia
+	Famagusta: /seatemp_famagusta
+	Protaras: /seatemp_protaras
+	Ayia-napa: /seatemp_ayianapa
+	`
+
+	pharmacies_commands_message = `
+	Please, define city: /pharmacies city_name
+	Or use commands for available cities:
+
+	Limassol: /pharmacies_limassol
+	Paphos: /pharmacies_pafos
+	Larnaka: /pharmacies_larnaka
+	Nicosia (Kato Pyrgos): /pharmacies_nicosia
+	Famagusta: /pharmacies_famagusta
+	`
+
+	pollution_commands_message = `
+	Please, define city: /pollution city_name
+	Or use commands for available cities:
+
+	Limassol: /pollution_limassol
+	Paphos: /pollution_pafos
+	Larnaka: /pollution_larnaka
+	Nicosia (Kato Pyrgos): /pollution_nicosia
+	`
 )
 
 func main() {
@@ -54,7 +89,7 @@ func main() {
 
 		bot.Debug = true
 
-		// Temporarily disable services
+		// Temporarily disable services for prod
 		//setupServices(bot)
 
 		updates := bot.ListenForWebhook("/" + bot.Token)
@@ -98,9 +133,6 @@ func main() {
 			}
 		}
 	}
-
-
-
 }
 
 func setupServices(bot *tgbotapi.BotAPI) {
@@ -116,13 +148,12 @@ func setupServices(bot *tgbotapi.BotAPI) {
 				continue
 			}
 			// Send messages to all chats
-
 			for _, chatId := range chats {
 				msg := tgbotapi.NewMessage(chatId, pollutionData)
 				bot.Send(msg)
 			}
 
-			// // Set a ticker for batch sending updates to ids
+			// TODO: Set a ticker for batch sending updates to ids
 
 		}
 	}()
@@ -137,6 +168,18 @@ func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 
 	tokens := strings.Fields(update.Message.Text)
 	command := tokens[0]
+
+	// Checking for composite cxommands like /pharmacies_limassol instead of /pharmacies limassol
+	compositeCommand := strings.Split(tokens[0], "_")
+
+	if len(compositeCommand) == 2 {
+		command = compositeCommand[0]
+		if len(tokens) == 1 {
+			tokens = append(tokens, compositeCommand[1])
+		} else {
+			tokens[1] = compositeCommand[1]
+		}
+	}
 
 	switch command {
 	case "/start":
@@ -167,6 +210,13 @@ func processUpdate(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 }
 
 func sendPharmacies(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
+
+	if len(tokens) < 2 {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, pharmacies_commands_message)
+		bot.Send(msg)
+		return;
+	}
+
 	allPharmacies, err := pharmacies.GetAllPharmacies()
 	if err != nil {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Some error happen: " + err.Error())
@@ -174,19 +224,6 @@ func sendPharmacies(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []strin
 		return;
 	}
 
-	// Send info for all cities
-	if len(tokens) < 2 {
-		for _, pharmaciesInCity := range allPharmacies {
-			text := pharmacies.FormatPharmacies(pharmaciesInCity)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, strings.Join([]string{text}, "\n"))
-			msg.ParseMode = tgbotapi.ModeHTML
-			bot.Send(msg)
-		}
-		return;
-	}
-
-	// If envoked as /pharmacies CITY_NAME
 	city := pharmacies.NormalizeCity(strings.ToLower(tokens[1]))
 	found := false
 	for _, pharmaciesInCity := range allPharmacies {
@@ -211,7 +248,7 @@ func sendPharmacies(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []strin
 func sendSeaTemp(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
 
 	if len(tokens) < 2 {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Please, define city: /seatemp city_name")
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, seatemp_commands_message)
 		bot.Send(msg)
 		return
 	}
@@ -231,7 +268,7 @@ func sendSeaTemp(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) 
 
 func sendPollution(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
 	if len(tokens) < 2 {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Please, define city: /pollution city_name")
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, pollution_commands_message)
 		bot.Send(msg)
 		return
 	}

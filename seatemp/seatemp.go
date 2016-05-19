@@ -73,7 +73,7 @@ func normalizeCity(city string) string {
 		return "protaras"
 	}
 
-	if city == "ayia-napa" || city == "ayia" {
+	if city == "ayia-napa" || city == "ayia" || city == "ayianapa" {
 		return "ayia-napa"
 	}
 
