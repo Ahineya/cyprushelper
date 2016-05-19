@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-	"github.com/Ahineya/cyprushelper/utils"
+	"github.com/Ahineya/cyprushelper/helpers/utils"
 )
 
 const (

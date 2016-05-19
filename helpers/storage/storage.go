@@ -4,7 +4,7 @@ import (
 	"os"
 	"github.com/orchestrate-io/gorc"
 	"fmt"
-	"github.com/Ahineya/cyprushelper/utils"
+	"github.com/Ahineya/cyprushelper/helpers/utils"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 

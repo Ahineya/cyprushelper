@@ -14,7 +14,6 @@ import (
 
 const (
 	pollution_url = "http://www.airquality.dli.mlsi.gov.cy/site/ajax_exec"
-	pollution_service_update_time = "2000"
 )
 
 type PollutionData struct {
@@ -87,39 +86,11 @@ func GetPollution(city string) (*PollutionResult, error) {
 	return &pollutionResult, nil
 }
 
-func CreatePollutionService(syncChan chan string) {
-	fmt.Println("[PollutionService]: Initialized")
-	ticker := time.NewTicker(time.Second)
-	cachedPollutionLevel := ""
-	go func() {
-		for t := range ticker.C {
-			if t.Format("0405") == pollution_service_update_time {
-				fmt.Println("[PollutionService]: Getting updates")
-				pollutionResult, err := GetPollution("limassol")
-				if err != nil {
-					fmt.Println("[PollutionService]: " + err.Error())
-				}
-
-				for _, pollutionData := range pollutionResult.Data {
-					if pollutionData.PollutantCode == "PM10" {
-						pollutionLevel := getPollutionLevel(pollutionData.PollutantCode, pollutionData.Value)
-						if pollutionLevel != cachedPollutionLevel {
-							cachedPollutionLevel = pollutionLevel
-							fmt.Println("[PollutionService]: Pollution level changed, sending updates")
-							syncChan <- "Current pollution level in Limassol changed to " + pollutionLevel
-						}
-					}
-				}
-			}
-		}
-	}()
-}
-
 func FormatPollution(pollution *PollutionResult) string {
 	result := ""
 
 	for _, pollutionData := range pollution.Data {
-		result += "[<b>" + getPollutionLevel(pollutionData.PollutantCode, pollutionData.Value) + "</b>] "
+		result += "[<b>" + GetPollutionLevel(pollutionData.PollutantCode, pollutionData.Value) + "</b>] "
 		result += normalizePollutantCode(pollutionData.PollutantCode) + ": "
 		result += "<b>" + pollutionData.Value + "</b> μg/m³\n"
 	}
@@ -162,7 +133,7 @@ func normalizePollutantCode(pollutantCode string) string {
 	return pollutants[pollutantCode]
 }
 
-func getPollutionLevel(pollutantCode string, value string) string {
+func GetPollutionLevel(pollutantCode string, value string) string {
 	intValue, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		fmt.Println(err.Error())

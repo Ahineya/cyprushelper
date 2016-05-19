@@ -5,9 +5,8 @@ import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"net/http"
-	"github.com/Ahineya/cyprushelper/pollution"
-	"github.com/Ahineya/cyprushelper/storage"
 	"github.com/Ahineya/cyprushelper/commandrouter"
+	"github.com/Ahineya/cyprushelper/services/pollutionservice"
 )
 
 func main() {
@@ -96,26 +95,6 @@ func runDev() {
 }
 
 func setupServices(bot *tgbotapi.BotAPI) {
-	// Setting up a pollution service
-	pollutionServiceChannel := make(chan string)
-	pollution.CreatePollutionService(pollutionServiceChannel)
-	go func() {
-		for pollutionData := range pollutionServiceChannel {
-
-			// Get all chat Ids
-			chats, err := storage.GetChatIds()
-			if err != nil {
-				continue
-			}
-			// Send messages to all chats
-			for _, chatId := range chats {
-				msg := tgbotapi.NewMessage(chatId, pollutionData)
-				bot.Send(msg)
-			}
-
-			// TODO: Set a ticker for batch sending updates to ids
-
-		}
-	}()
+	pollutionservice.Start(bot)
 }
 
