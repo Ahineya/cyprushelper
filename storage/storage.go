@@ -25,7 +25,7 @@ func UpdateChats(message *tgbotapi.Message) {
 		chats = append(chats, message.Chat.ID)
 
 		c := gorc.NewClient(storage_token)
-		_, err = c.Put("stats", chats_collection_name, chats)
+		_, err = c.Put("stats", chats_collection_name, Chats{chats})
 		if err != nil {
 			fmt.Println("[STORAGE]:" + err.Error())
 			return
