@@ -43,7 +43,7 @@ const (
 	Limassol: /pharmacies_limassol
 	Paphos: /pharmacies_pafos
 	Larnaka: /pharmacies_larnaka
-	Nicosia (Kato Pyrgos): /pharmacies_nicosia
+	Nicosia: /pharmacies_nicosia
 	Famagusta: /pharmacies_famagusta
 	`
 
@@ -54,7 +54,7 @@ const (
 	Limassol: /pollution_limassol
 	Paphos: /pollution_pafos
 	Larnaka: /pollution_larnaka
-	Nicosia (Kato Pyrgos): /pollution_nicosia
+	Nicosia: /pollution_nicosia
 	`
 )
 
