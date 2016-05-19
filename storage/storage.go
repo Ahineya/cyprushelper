@@ -53,7 +53,7 @@ func GetChatIds() ([]int64, error) {
 		}
 
 		c := gorc.NewClient(storage_token)
-		result, err := c.Get("stats", "chats")
+		result, err := c.Get("stats", chats_collection_name)
 		if err != nil {
 			fmt.Println("[STORAGE]:" + err.Error())
 			return []int64{}, err
