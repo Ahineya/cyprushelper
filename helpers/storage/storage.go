@@ -6,15 +6,20 @@ import (
 	"github.com/Ahineya/cyprushelper/helpers/utils"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/Ahineya/cyprushelper/helpers/logger"
+	"github.com/Ahineya/cyprushelper/dataproviders/pollution"
+	"fmt"
 )
 
 type Chats struct {
-	Ids []int64 `json:"ids"`
+	Ids Ids `json:"ids"`
 }
 
+type Ids []int64
+
 var storage_token string
-var cachedChats []int64
+var cachedChatIds Ids
 var chats_collection_name string
+
 func UpdateChats(message *tgbotapi.Message) {
 	chats, err := GetChatIds()
 	if err != nil {
@@ -38,7 +43,7 @@ func UpdateChats(message *tgbotapi.Message) {
 }
 
 func GetChatIds() ([]int64, error) {
-	if len(cachedChats) == 0 {
+	if len(cachedChatIds) == 0 {
 		if chats_collection_name == "" {
 			env := os.Getenv("ENV")
 			if env == "PROD" {
@@ -62,10 +67,105 @@ func GetChatIds() ([]int64, error) {
 		var chats Chats
 		result.Value(&chats)
 
-		cachedChats = chats.Ids
+		cachedChatIds = chats.Ids
 
 		return chats.Ids, nil
 	}
 
-	return cachedChats, nil
+	return cachedChatIds, nil
+}
+
+func SubscribeToPollution(chatId int64, city string) error {
+	city = pollution.NormalizeCity(city)
+	if storage_token == "" {
+		storage_token = os.Getenv("STORAGE_TOKEN")
+	}
+	c := gorc.NewClient(storage_token)
+	result, err := c.Get("pollution-subscriptions", city)
+	if err != nil {
+		logger.Error("STORAGE", "Subscribe to pollution error: " + err.Error())
+		return err
+	}
+
+	var chats Chats
+	result.Value(&chats)
+
+	logger.Log("STP", fmt.Sprintf("%s", chats.Ids))
+
+	found := false
+	for _, chId := range chats.Ids {
+		if chId == chatId {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		chats.Ids = append(chats.Ids, chatId)
+
+		_, err = c.Put("pollution-subscriptions", city, chats)
+		if err != nil {
+			logger.Error("STORAGE", "Subscribe to pollution error: " + err.Error())
+			return err
+		}
+	}
+
+	return nil
+}
+
+func UnsubscribeFromPollution(chatId int64, city string) error {
+	city = pollution.NormalizeCity(city)
+	if storage_token == "" {
+		storage_token = os.Getenv("STORAGE_TOKEN")
+	}
+	c := gorc.NewClient(storage_token)
+	result, err := c.Get("pollution-subscriptions", city)
+	if err != nil {
+		logger.Error("STORAGE", "Unsubscribe from pollution error: " + err.Error())
+		return err
+	}
+
+	var chats Chats
+	result.Value(&chats)
+
+	logger.Log("STP", fmt.Sprintf("%s", chats.Ids))
+
+	found := false
+	var idx int
+	for index, chId := range chats.Ids {
+		if chId == chatId {
+			found = true
+			idx = index
+			break
+		}
+	}
+
+	if found {
+		chats.Ids = append(chats.Ids[:idx], chats.Ids[idx+1:]...)
+
+		_, err = c.Put("pollution-subscriptions", city, chats)
+		if err != nil {
+			logger.Error("STORAGE", "Unsubscribe from pollution error: " + err.Error())
+			return err
+		}
+	}
+
+	return nil
+}
+
+func GetPollutionSubscribersForCity(city string) (Ids, error) {
+	city = pollution.NormalizeCity(city)
+	if storage_token == "" {
+		storage_token = os.Getenv("STORAGE_TOKEN")
+	}
+	c := gorc.NewClient(storage_token)
+	result, err := c.Get("pollution-subscriptions", city)
+	if err != nil {
+		logger.Error("STORAGE", "Unsubscribe from pollution error: " + err.Error())
+		return Ids{}, err
+	}
+
+	var chats Chats
+	result.Value(&chats)
+	return chats.Ids, nil
 }

@@ -37,7 +37,7 @@ func GetPollution(city string) (*PollutionResult, error) {
 	from := time.Now().Add(-time.Hour).Format("02/01/2006+15:04")
 	to := time.Now().Format("02/01/2006+15:04")
 
-	city = normalizeCity(city)
+	city = NormalizeCity(city)
 	if city == "" {
 		return nil, errors.New("There is no info for this city")
 	}
@@ -98,7 +98,7 @@ func FormatPollution(pollution *PollutionResult) string {
 	return result
 }
 
-func normalizeCity(city string) string {
+func NormalizeCity(city string) string {
 	if city == "limassol" || city == "lemesos" {
 		return "LIMTRA"
 	}
