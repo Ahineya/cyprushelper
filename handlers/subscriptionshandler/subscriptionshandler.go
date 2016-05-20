@@ -5,7 +5,7 @@ import (
 )
 
 func Handle(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Boo")
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	var keyboard [][]tgbotapi.KeyboardButton
 	for _, city := range []string{"limassol", "larnaka", "paphos", "nicosia"} {
 		keyboard = append(keyboard, []tgbotapi.KeyboardButton{

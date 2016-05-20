@@ -8,7 +8,6 @@ import (
 	"github.com/Ahineya/cyprushelper/helpers/logger"
 )
 
-// TODO: Make proper metrics
 type Message struct {
 	Params []string
 }
