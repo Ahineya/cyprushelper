@@ -26,7 +26,7 @@ type PollutionData struct {
 }
 
 type PollutionResult struct {
-	Data []PollutionData `json:"data"`
+	Data     []PollutionData `json:"data"`
 	DateFrom string `json:"date_from"`
 	DateTo   string `json:"date_to"`
 }
@@ -44,8 +44,8 @@ func GetPollution(city string) (*PollutionResult, error) {
 
 	requestStr := `ajax_call=1&post_data[action]=get_plot_values_sd_dates`
 	requestStr += `&post_data[station_code]=` + city
-	requestStr += `&post_data[date_from]=`+ from
-	requestStr += `&post_data[date_to]=`+ to
+	requestStr += `&post_data[date_from]=` + from
+	requestStr += `&post_data[date_to]=` + to
 	requestStr += `&post_data[db_period]=1-hour`
 
 	request, err := url.Parse(requestStr)

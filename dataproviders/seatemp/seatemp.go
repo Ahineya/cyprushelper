@@ -11,7 +11,7 @@ const (
 	seatemp_selector = "#sea-temperature"
 )
 
-func GetSeaTemp(city string) (string, error){
+func GetSeaTemp(city string) (string, error) {
 	city = normalizeCity(city)
 	doc, err := goquery.NewDocument(fmt.Sprintf(seatemp_url, city))
 

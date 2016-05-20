@@ -27,5 +27,5 @@ func Error(moduleName string, message string) {
 }
 
 func log(color chalk.Color, level, moduleName string, message string) {
-	fmt.Println(color, "[" + moduleName + "][" + level + "]" , message, chalk.Reset)
+	fmt.Println(color, "[" + moduleName + "][" + level + "]", message, chalk.Reset)
 }

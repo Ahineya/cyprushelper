@@ -23,8 +23,8 @@ var Messages = map[string]string{
 	`,
 }
 
-
 var bot_name string
+
 func Route(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	if os.Getenv("ENV") == "PROD" {
 		bot_name = "CyprusHelper_bot"

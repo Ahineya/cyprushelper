@@ -10,8 +10,7 @@ import (
 
 // TODO: Make proper metrics
 type Message struct {
-	SomeMetric    int
-	AnotherMetric int
+	Params []string
 }
 
 var botan_token string
@@ -27,7 +26,7 @@ func Track(message *tgbotapi.Message) {
 	tokens := strings.Fields(message.Text)
 	command := tokens[0]
 
-	bot.TrackAsync(message.From.ID, Message{100, 500}, command, func(ans botan.Answer, err []error) {
+	bot.TrackAsync(message.From.ID, Message{tokens}, command, func(ans botan.Answer, err []error) {
 		if len(err) == 0 {
 			logger.Info("BOTAN", ans.Status + " " + ans.Info)
 		} else {

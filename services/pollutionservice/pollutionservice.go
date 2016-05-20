@@ -14,7 +14,7 @@ const (
 )
 
 type pollutionServiceData struct {
-	City string
+	City    string
 	Message string
 }
 
@@ -45,10 +45,10 @@ func createPollutionService(syncChan chan pollutionServiceData) {
 	ticker := time.NewTicker(time.Second)
 
 	pollutionLevelsCache := make(map[string]string)
-	pollutionLevelsCache["LIMTRA"] = "High"
-	pollutionLevelsCache["LARTRA"] = "High"
-	pollutionLevelsCache["PAFTRA"] = "High"
-	pollutionLevelsCache["NICTRA"] = "High"
+	pollutionLevelsCache["LIMTRA"] = "Low"
+	pollutionLevelsCache["LARTRA"] = "Low"
+	pollutionLevelsCache["PAFTRA"] = "Low"
+	pollutionLevelsCache["NICTRA"] = "Low"
 
 	go func() {
 		for t := range ticker.C {
@@ -77,11 +77,11 @@ func getPollutionUpdates(syncChan chan pollutionServiceData, city string, pollut
 			pollutionLevel := pollution.GetPollutionLevel(pollutionData.PollutantCode, pollutionData.Value)
 			if needToSendPollutionUpdate(pollutionLevelsCache[normalizedCity], pollutionLevel) {
 				pollutionLevelsCache[normalizedCity] = pollutionLevel
-				logger.Info("PollutionService", "Pollution level for " + city +" changed, sending updates")
+				logger.Info("PollutionService", "Pollution level for " + city + " changed, sending updates")
 
 				syncChan <- pollutionServiceData{city, "Current pollution level in " + city + " changed to " + pollutionLevel}
 			} else {
-				logger.Info("PollutionService", "Pollution level for " + city +" not changed")
+				logger.Info("PollutionService", "Pollution level for " + city + " not changed")
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 package storage
 
+// TODO: refactor this mess
+
 import (
 	"os"
 	"github.com/orchestrate-io/gorc"
@@ -141,7 +143,7 @@ func UnsubscribeFromPollution(chatId int64, city string) error {
 	}
 
 	if found {
-		chats.Ids = append(chats.Ids[:idx], chats.Ids[idx+1:]...)
+		chats.Ids = append(chats.Ids[:idx], chats.Ids[idx + 1:]...)
 
 		_, err = c.Put("pollution-subscriptions", city, chats)
 		if err != nil {

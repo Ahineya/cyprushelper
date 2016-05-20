@@ -37,7 +37,7 @@ func Handle(bot *tgbotapi.BotAPI, update tgbotapi.Update, tokens []string) {
 		return
 	}
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperature in " + strings.Join(tokens[1:], " ") +" is " + seatemp)
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Sea temperature in " + strings.Join(tokens[1:], " ") + " is " + seatemp)
 	bot.Send(msg)
 
 }
