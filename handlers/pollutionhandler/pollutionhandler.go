@@ -22,7 +22,7 @@ const (
 
 	You will receive updates every hour if the pollution situation has changed noteably
 
-	Currently subscription works only for Limassol.
+	Also you can manage your subscriptions using /subscriptions command
 	`
 )
 

@@ -8,6 +8,8 @@ import (
 	"github.com/Ahineya/cyprushelper/handlers/pollutionhandler"
 	"github.com/Ahineya/cyprushelper/handlers/seatemphandler"
 	"github.com/Ahineya/cyprushelper/handlers/pharmacieshandler"
+	"github.com/Ahineya/cyprushelper/handlers/subscriptionshandler"
+	"os"
 )
 
 var Messages = map[string]string{
@@ -16,19 +18,23 @@ var Messages = map[string]string{
 	/pharmacies
 	/seatemp
 	/pollution
+
+	/subscriptions
 	`,
 }
 
-const (
-	// TODO: define as environment variable
-	bot_name = "CyprusHelper_bot"
-)
 
+var bot_name string
 func Route(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
-	//if os.Getenv("ENV") == "PROD" {
-	stats.Track(update.Message)
+	if os.Getenv("ENV") == "PROD" {
+		bot_name = "CyprusHelper_bot"
+	} else {
+		bot_name = "cyprushelperbot"
+	}
+	if os.Getenv("ENV") == "PROD" {
+		stats.Track(update.Message)
+	}
 	go storage.UpdateChats(update.Message)
-	//}
 
 	tokens := strings.Fields(update.Message.Text)
 	command := tokens[0]
@@ -70,6 +76,11 @@ func Route(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 		pollutionhandler.Handle(bot, update, tokens)
 	case "/pollution" + bot_name:
 		pollutionhandler.Handle(bot, update, tokens)
+	case "/subscriptions":
+		subscriptionshandler.Handle(bot, update, tokens)
+	case "/subscriptions" + bot_name:
+		subscriptionshandler.Handle(bot, update, tokens)
 	}
+
 }
 
