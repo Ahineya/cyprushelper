@@ -53,8 +53,7 @@ func runProd() {
 
 	bot.Debug = true
 
-	// Temporarily disable services for prod
-	//setupServices(bot)
+	setupServices(bot)
 
 	updates := bot.ListenForWebhook("/" + bot.Token)
 
